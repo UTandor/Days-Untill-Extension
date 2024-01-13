@@ -1,15 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
-import { Input } from "@/components/ui/input";
+
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 
 function App() {
   const currentDate = new Date();
@@ -21,6 +13,7 @@ function App() {
     storedDate || currentDate.toISOString().split("T")[0]
   );
   const [differenceInDays, setDifferenceInDays] = useState<number | null>(null);
+  const [include, setInclude] = useState<string | null>(null); // New state for selected days
 
   const handleSubmit = (e?: FormEvent) => {
     if (e) {
@@ -33,9 +26,10 @@ function App() {
 
     setDifferenceInDays(daysDifference);
 
-    // Save task and date to localStorage
+    // Save task, date, and include to localStorage
     localStorage.setItem("task", task);
     localStorage.setItem("date", date.split("T")[0]);
+    localStorage.setItem("include", include || "");
   };
 
   useEffect(() => {
@@ -85,21 +79,7 @@ function App() {
           <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-2 ">
             Include:
           </h1>
-          <Select>
-            <SelectTrigger className="w-[230px]">
-              <SelectValue placeholder="Select a fruit" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Fruits</SelectLabel>
-                <SelectItem value="apple">Apple</SelectItem>
-                <SelectItem value="banana">Banana</SelectItem>
-                <SelectItem value="blueberry">Blueberry</SelectItem>
-                <SelectItem value="grapes">Grapes</SelectItem>
-                <SelectItem value="pineapple">Pineapple</SelectItem>
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+          <Custom />
         </div>
         <Button
           type="submit"
@@ -114,3 +94,47 @@ function App() {
 }
 
 export default App;
+
+const Custom = () => {
+  const daysList = [
+    { S: "S" },
+    { M: "M" },
+    { T: "T" },
+    { W: "W" },
+    { T: "Th" },
+    { F: "F" },
+    { S: "St" },
+  ];
+  const [selectedDays, setSelectedDays] = useState([]);
+
+  const toggleDay = (day) => {
+    if (selectedDays.includes(day)) {
+      setSelectedDays(
+        selectedDays.filter((selectedDay) => selectedDay !== day)
+      );
+    } else {
+      setSelectedDays([...selectedDays, day]);
+    }
+  };
+
+  return (
+    <div className="flex flex-row space-x-2">
+      {daysList.map((day, id) => (
+        <div key={Object.keys(day)[0]}>
+          <div
+            className={
+              selectedDays.includes(day[Object.keys(day)[0]])
+                ? "select-none text-primary-foreground bg-primary w-8 text-center items-center text-black flex justify-center h-8 rounded-full"
+                : "select-none w-8 text-center items-center text-black flex justify-center h-8 rounded-full bg-blue-100"
+            }
+            onClick={() => {
+              toggleDay(day[Object.keys(day)[0]]);
+            }}
+          >
+            {day[Object.keys(day)[0]]}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
