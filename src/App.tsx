@@ -1,7 +1,15 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 function App() {
   const currentDate = new Date();
@@ -35,11 +43,11 @@ function App() {
   }, []);
 
   return (
-    <div className="h-[350px] dark w-[275px] grid place-items-center font-mono bg-card text-popover-foreground">
+    <div className="h-[450px] dark w-[300px] py-12 grid place-items-center font-mono bg-card text-popover-foreground">
       <div>
         {differenceInDays !== null && (
           <>
-            <h1 className="font-semibold text-primary text-3xl text-center">
+            <h1 className="font-semibold text-primary row-span-2 text-3xl text-center">
               <p>{Math.abs(differenceInDays)}</p>
             </h1>
             <div>
@@ -50,27 +58,54 @@ function App() {
           </>
         )}
       </div>
-      <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center gap-y-5">
+      <form
+        onSubmit={handleSubmit}
+        className="grid place-items-center gap-2 mt-10 relative mb-32"
+      >
         <Input
           type="text"
-          className="w-[230px] text bg-input fixed top-[15%]"
+          className="w-[230px] text bg-input"
           placeholder="Enter event name"
           value={task}
           onChange={(e) => setTask(e.target.value)}
         />
-        <Separator className="bg-card-foreground opacity-30 fixed w-[230px] top-[23%] " />
         <div>
-          <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-0">Deadline</h1>
+          <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-2 ">
+            Deadline
+          </h1>
           <Input
             type="date"
-            className="w-[230px] text bg-input"
+            className="w-[230px] bg-input"
             placeholder="Date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
-        
-        <Button type="submit" variant={"default"} className="bg-primary text-primary-foreground">
+        <div className="mb-3">
+          <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-2 ">
+            Include:
+          </h1>
+          <Select>
+            <SelectTrigger className="w-[230px]">
+              <SelectValue placeholder="Select a fruit" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Fruits</SelectLabel>
+                <SelectItem value="apple">Apple</SelectItem>
+                <SelectItem value="banana">Banana</SelectItem>
+                <SelectItem value="blueberry">Blueberry</SelectItem>
+                <SelectItem value="grapes">Grapes</SelectItem>
+                <SelectItem value="pineapple">Pineapple</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
+        <Button
+          type="submit"
+          variant={"default"}
+          className="bg-primary text-primary-foreground"
+        >
           Save
         </Button>
       </form>
