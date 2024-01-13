@@ -1,17 +1,20 @@
-import React, { useEffect, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 function App() {
   const currentDate = new Date();
-  const [task, setTask] = useState<string>("");
+  const storedDate = localStorage.getItem("date");
+  const storedTask = localStorage.getItem("task");
+
+  const [task, setTask] = useState<string>(storedTask || "");
   const [date, setDate] = useState<string>(
-    currentDate.toISOString().split("T")[0]
+    storedDate || currentDate.toISOString().split("T")[0]
   );
   const [differenceInDays, setDifferenceInDays] = useState<number | null>(null);
 
-  const handleSubmit = (e?) => {
+  const handleSubmit = (e?: FormEvent) => {
     if (e) {
       e.preventDefault();
     }
@@ -21,9 +24,10 @@ function App() {
     const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
     setDifferenceInDays(daysDifference);
-    if (localStorage.getItem("days") !== null) {
-      localStorage.setItem("days", daysDifference.toString());
-    }
+
+    // Save task and date to localStorage
+    localStorage.setItem("task", task);
+    localStorage.setItem("date", date.split("T")[0]);
   };
 
   useEffect(() => {
@@ -31,7 +35,7 @@ function App() {
   }, []);
 
   return (
-    <div className="h-[350px] dark absolute w-[275px] grid place-items-center font-mono bg-card text-popover-foreground">
+    <div className="h-[350px] dark w-[275px] grid place-items-center font-mono bg-card text-popover-foreground">
       <div>
         {differenceInDays !== null && (
           <>
@@ -46,31 +50,28 @@ function App() {
           </>
         )}
       </div>
-      <form
-        onSubmit={handleSubmit}
-        className="flex flex-col justify-center items-center gap-y-5"
-      >
+      <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center gap-y-5">
         <Input
-          type="text" // Fix: Corrected the type to "text" for the task input
-          className="w-[200px] text bg-input fixed top-32"
+          type="text"
+          className="w-[230px] text bg-input fixed top-[15%]"
           placeholder="Enter event name"
-          value={task} // Fix: Added value prop for controlled input
+          value={task}
           onChange={(e) => setTask(e.target.value)}
         />
-        <Separator className=" bg-card-foreground opacity-30 " />
-        <Input
-          type="date"
-          className="w-[200px] text bg-input "
-          placeholder="Date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-        />
-        <Button
-          type="submit"
-          variant={"default"}
-          className="bg-primary text-primary-foreground"
-        >
-          Submit
+        <Separator className="bg-card-foreground opacity-30 fixed w-[230px] top-[23%] " />
+        <div>
+          <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-0">Deadline</h1>
+          <Input
+            type="date"
+            className="w-[230px] text bg-input"
+            placeholder="Date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+        
+        <Button type="submit" variant={"default"} className="bg-primary text-primary-foreground">
+          Save
         </Button>
       </form>
     </div>
