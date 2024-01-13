@@ -1,21 +1,22 @@
 import { FormEvent, useEffect, useState } from "react";
-
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import Custom from "@/components/Custom";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 function App() {
-
   const currentDate = new Date();
   const storedDate = localStorage.getItem("date");
   const storedTask = localStorage.getItem("task");
+  const storedInclude = localStorage.getItem("include");
 
   const [task, setTask] = useState<string>(storedTask || "");
   const [date, setDate] = useState<string>(
     storedDate || currentDate.toISOString().split("T")[0]
   );
   const [differenceInDays, setDifferenceInDays] = useState<number | null>(null);
-  const [include, setInclude] = useState<string[] | null>([]);
+  const [include, setInclude] = useState<string[]>(
+    storedInclude ? JSON.parse(storedInclude) : []
+  );
 
   const handleSubmit = (e?: FormEvent) => {
     if (e) {
@@ -26,7 +27,10 @@ function App() {
     const timeDifference = selectedDate.getTime() - currentDate.getTime();
     const daysDifference = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
 
-    setDifferenceInDays(daysDifference);
+    const excludedCount = countExcludedDays(currentDate, selectedDate, include);
+    const adjustedDifference = daysDifference - excludedCount;
+
+    setDifferenceInDays(adjustedDifference);
 
     localStorage.setItem("task", task);
     localStorage.setItem("date", date.split("T")[0]);
@@ -35,11 +39,30 @@ function App() {
 
   useEffect(() => {
     handleSubmit();
-  }, []);
+  }, [include]);
+
+  const countExcludedDays = (
+    startDate: Date,
+    endDate: Date,
+    selectedDays: string[]
+  ): number => {
+    const allDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]; // Add this line
+    let excludedCount = 0;
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const currentDay = allDays[currentDate.getDay()];
+      if (!selectedDays.includes(currentDay)) {
+        excludedCount++;
+      }
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return excludedCount;
+  };
 
   const handleIncludeChange = (selectedDays: string[]) => {
     setInclude(selectedDays);
-    console.log("Selected Days:", selectedDays);
   };
 
   return (
@@ -52,7 +75,7 @@ function App() {
             </h1>
             <div>
               <p className="text-center font-medium text-secondary-foreground">
-                {differenceInDays > 0 ? "Days until" : "Days since"}
+                {differenceInDays > 0 ? "Days left until" : "Days since"}
               </p>
             </div>
           </>
@@ -62,7 +85,6 @@ function App() {
         onSubmit={handleSubmit}
         className="grid place-items-center gap-2 mt-10 relative mb-32"
       >
-        {}
         <Input
           type="text"
           className="w-[230px] text bg-input"
@@ -70,7 +92,6 @@ function App() {
           value={task}
           onChange={(e) => setTask(e.target.value)}
         />
-        {}
         <div>
           <h1 className="text-center font-medium text-sm text-foreground opacity-70 mb-2 mt-2 ">
             Deadline
@@ -83,14 +104,12 @@ function App() {
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
-        {}
         <div className="mb-3">
           <h1 className="text-center font-medium text-sm text-foreground opacity-70 mb-2 mt-2 ">
             Include:
           </h1>
-          <Custom onChange={handleIncludeChange} />
+          <Custom onChange={handleIncludeChange} selectedDays={include} />
         </div>
-        {}
         <Button
           type="submit"
           variant={"default"}
