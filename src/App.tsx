@@ -2,8 +2,10 @@ import { FormEvent, useEffect, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import Custom from "@/components/Custom";
 
 function App() {
+
   const currentDate = new Date();
   const storedDate = localStorage.getItem("date");
   const storedTask = localStorage.getItem("task");
@@ -13,7 +15,7 @@ function App() {
     storedDate || currentDate.toISOString().split("T")[0]
   );
   const [differenceInDays, setDifferenceInDays] = useState<number | null>(null);
-  const [include, setInclude] = useState<string | null>(null); // New state for selected days
+  const [include, setInclude] = useState<string[] | null>([]);
 
   const handleSubmit = (e?: FormEvent) => {
     if (e) {
@@ -26,18 +28,22 @@ function App() {
 
     setDifferenceInDays(daysDifference);
 
-    // Save task, date, and include to localStorage
     localStorage.setItem("task", task);
     localStorage.setItem("date", date.split("T")[0]);
-    localStorage.setItem("include", include || "");
+    localStorage.setItem("include", JSON.stringify(include || []));
   };
 
   useEffect(() => {
     handleSubmit();
   }, []);
 
+  const handleIncludeChange = (selectedDays: string[]) => {
+    setInclude(selectedDays);
+    console.log("Selected Days:", selectedDays);
+  };
+
   return (
-    <div className="h-[450px] dark w-[300px] py-12 grid place-items-center font-mono bg-card text-popover-foreground">
+    <div className="h-[450px] w-[300px] py-12 grid place-items-center font-mono bg-card text-popover-foreground">
       <div>
         {differenceInDays !== null && (
           <>
@@ -56,6 +62,7 @@ function App() {
         onSubmit={handleSubmit}
         className="grid place-items-center gap-2 mt-10 relative mb-32"
       >
+        {}
         <Input
           type="text"
           className="w-[230px] text bg-input"
@@ -63,8 +70,9 @@ function App() {
           value={task}
           onChange={(e) => setTask(e.target.value)}
         />
+        {}
         <div>
-          <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-2 ">
+          <h1 className="text-center font-medium text-sm text-foreground opacity-70 mb-2 mt-2 ">
             Deadline
           </h1>
           <Input
@@ -75,12 +83,14 @@ function App() {
             onChange={(e) => setDate(e.target.value)}
           />
         </div>
+        {}
         <div className="mb-3">
-          <h1 className="text-center font-medium text-sm  text-foreground opacity-70 mb-2 mt-2 ">
+          <h1 className="text-center font-medium text-sm text-foreground opacity-70 mb-2 mt-2 ">
             Include:
           </h1>
-          <Custom />
+          <Custom onChange={handleIncludeChange} />
         </div>
+        {}
         <Button
           type="submit"
           variant={"default"}
@@ -94,47 +104,3 @@ function App() {
 }
 
 export default App;
-
-const Custom = () => {
-  const daysList = [
-    { S: "S" },
-    { M: "M" },
-    { T: "T" },
-    { W: "W" },
-    { T: "Th" },
-    { F: "F" },
-    { S: "St" },
-  ];
-  const [selectedDays, setSelectedDays] = useState([]);
-
-  const toggleDay = (day) => {
-    if (selectedDays.includes(day)) {
-      setSelectedDays(
-        selectedDays.filter((selectedDay) => selectedDay !== day)
-      );
-    } else {
-      setSelectedDays([...selectedDays, day]);
-    }
-  };
-
-  return (
-    <div className="flex flex-row space-x-2">
-      {daysList.map((day, id) => (
-        <div key={Object.keys(day)[0]}>
-          <div
-            className={
-              selectedDays.includes(day[Object.keys(day)[0]])
-                ? "select-none text-primary-foreground bg-primary w-8 text-center items-center text-black flex justify-center h-8 rounded-full"
-                : "select-none w-8 text-center items-center text-black flex justify-center h-8 rounded-full bg-blue-100"
-            }
-            onClick={() => {
-              toggleDay(day[Object.keys(day)[0]]);
-            }}
-          >
-            {day[Object.keys(day)[0]]}
-          </div>
-        </div>
-      ))}
-    </div>
-  );
-};
