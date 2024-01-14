@@ -1,4 +1,3 @@
-import { useState } from "react";
 
 interface Day {
   abbreviation: string;
@@ -30,14 +29,14 @@ const Custom: React.FC<CustomProps> = ({ onChange, selectedDays }) => {
   };
 
   return (
-    <div className="flex flex-row space-x-2">
+    <div className="flex dark flex-row space-x-2">
       {daysList.map((day) => (
         <div key={day.label}>
           <div
             className={
               selectedDays.includes(day.label)
                 ? "select-none text-lg text-primary-foreground bg-primary w-8 text-center items-center text-black flex justify-center h-8 rounded-full"
-                : "select-none text-lg w-8 text-center items-center text-black flex justify-center h-8 rounded-full bg-blue-100"
+                : "select-none text-lg w-8 text-center items-center text-muted flex justify-center h-8 rounded-full bg-muted-foreground"
             }
             onClick={() => {
               toggleDay(day.label);

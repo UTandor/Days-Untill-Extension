@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import Custom from "@/components/Custom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {setBadge} from "../public/service_worker";
 
 function App() {
   const currentDate = new Date();
@@ -35,6 +36,7 @@ function App() {
     localStorage.setItem("task", task);
     localStorage.setItem("date", date.split("T")[0]);
     localStorage.setItem("include", JSON.stringify(include || []));
+    setBadge(differenceInDays);
   };
 
   useEffect(() => {
@@ -66,7 +68,7 @@ function App() {
   };
 
   return (
-    <div className="h-[450px] w-[300px] py-12 grid place-items-center font-mono bg-card text-popover-foreground">
+    <div className=" py-12 grid place-items-center font-mono bg-card text-popover-foreground">
       <div>
         {differenceInDays !== null && (
           <>

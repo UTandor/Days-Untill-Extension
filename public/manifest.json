@@ -2,7 +2,15 @@
   "manifest_version": 3,
   "name": "Hello",
   "version": "1.0.1",
+  "permissions": ["storage", "activeTab"],
   "action": {
     "default_popup": "index.html"
-  } 
+  },
+  "background": {
+    "service_worker": "service_worker.js"
+  },
+  "icons": {
+    "48": "icon.png",
+    "96": "icon.png"
+  }
 }
